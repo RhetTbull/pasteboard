@@ -2,9 +2,7 @@
 
 Pasteboard is a macOS pasteboard/clipboard class for python using native NSPasteboard API.
 
-If you are looking for a cross-platform clipboard class, please check out [pyperclip](https://github.com/asweigart/pyperclip). It is a great library and I use it myself.
-
-I wrote this class because I needed a way to monitor the clipboard for changes and to get/set image data to the clipboard which pyperclip does not support.
+I wrote this class because I needed a way to monitor the clipboard for changes and to get/set image data to the clipboard, something other clipboard libraries like [pyperclip](https://github.com/asweigart/pyperclip) don't support.
 
 ## Installation
 
@@ -80,6 +78,11 @@ python -m pip install -r requirements.txt
 python -m pip install -r dev_requirements.txt
 python -m pytest --cov=pasteboard --mypy --mypy-ignore-missing-imports
 ```
+
+## See Also
+
+- [pasteboard](https://github.com/tobywf/pasteboard) - Another macOS pasteboard/clipboard class for python using native NSPasteboard API.
+- [pyperclip](https://github.com/asweigart/pyperclip) - A cross-platform clipboard package with a simple API.
 
 ## Contributing
 
