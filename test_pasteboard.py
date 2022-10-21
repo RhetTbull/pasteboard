@@ -4,9 +4,10 @@ import pathlib
 
 import pytest
 
-from pasteboard import Pasteboard
+from pasteboard import Pasteboard, PNG, TIFF, PasteboardTypeError
 
-TEST_IMAGE = "test.png"
+TEST_IMAGE_PNG = "test.png"
+TEST_IMAGE_TIFF = "test.tiff"
 
 
 def test_copy_paste():
@@ -36,32 +37,32 @@ def test_clear():
 def test_copy_paste_image(tmp_path):
     """Test copy_image() and paste_image() methods"""
     pb = Pasteboard()
-    pb.copy_image(TEST_IMAGE)
-    temp_file = tmp_path / TEST_IMAGE
-    pb.paste_image(str(temp_file), overwrite=False)
+    pb.copy_image(TEST_IMAGE_PNG, PNG)
+    temp_file = tmp_path / TEST_IMAGE_PNG
+    pb.paste_image(str(temp_file), PNG, overwrite=False)
     assert temp_file.exists()
-    assert open(TEST_IMAGE, "rb").read() == open(temp_file, "rb").read()
+    assert open(TEST_IMAGE_PNG, "rb").read() == open(temp_file, "rb").read()
 
     with pytest.raises(FileExistsError):
-        pb.paste_image(str(temp_file), overwrite=False)
+        pb.paste_image(str(temp_file), PNG, overwrite=False)
 
-    pb.paste_image(str(temp_file), overwrite=True)
+    pb.paste_image(str(temp_file), PNG, overwrite=True)
     assert temp_file.exists()
 
 
 def test_copy_paste_image_pathlib(tmp_path):
     """Test copy_image() and paste_image() methods with pathlib.Path"""
     pb = Pasteboard()
-    pb.copy_image(pathlib.Path(TEST_IMAGE))
-    temp_file = tmp_path / TEST_IMAGE
-    pb.paste_image(pathlib.Path(temp_file), overwrite=False)
+    pb.copy_image(pathlib.Path(TEST_IMAGE_PNG), PNG)
+    temp_file = tmp_path / TEST_IMAGE_PNG
+    pb.paste_image(pathlib.Path(temp_file), PNG, overwrite=False)
     assert temp_file.exists()
-    assert open(TEST_IMAGE, "rb").read() == open(temp_file, "rb").read()
+    assert open(TEST_IMAGE_PNG, "rb").read() == open(temp_file, "rb").read()
 
     with pytest.raises(FileExistsError):
-        pb.paste_image(pathlib.Path(temp_file), overwrite=False)
+        pb.paste_image(pathlib.Path(temp_file), PNG, overwrite=False)
 
-    pb.paste_image(pathlib.Path(temp_file), overwrite=True)
+    pb.paste_image(pathlib.Path(temp_file), PNG, overwrite=True)
     assert temp_file.exists()
 
 
@@ -75,31 +76,50 @@ def test_get_set_text():
 def test_get_set_image(tmp_path):
     """Test get_image() and set_image() methods"""
     pb = Pasteboard()
-    pb.set_image(TEST_IMAGE)
+    pb.set_image(TEST_IMAGE_PNG, PNG)
     temp_file = tmp_path / "temp.png"
-    pb.get_image(temp_file, overwrite=False)
-    assert open(TEST_IMAGE, "rb").read() == open(temp_file, "rb").read()
+    pb.get_image(temp_file, PNG, overwrite=False)
+    assert open(TEST_IMAGE_PNG, "rb").read() == open(temp_file, "rb").read()
 
     with pytest.raises(FileExistsError):
-        pb.get_image(temp_file, overwrite=False)
+        pb.get_image(temp_file, PNG, overwrite=False)
 
-    pb.get_image(temp_file, overwrite=True)
-    assert open(TEST_IMAGE, "rb").read() == open(temp_file, "rb").read()
+    pb.get_image(temp_file, PNG, overwrite=True)
+    assert open(TEST_IMAGE_PNG, "rb").read() == open(temp_file, "rb").read()
 
 
 def test_get_set_image_pathlib(tmp_path):
     """Test get_image() and set_image() methods with pathlib.Path"""
     pb = Pasteboard()
-    pb.set_image(pathlib.Path(TEST_IMAGE))
+    pb.set_image(pathlib.Path(TEST_IMAGE_PNG), PNG)
     temp_file = tmp_path / "temp.png"
-    pb.get_image(temp_file, overwrite=False)
-    assert open(TEST_IMAGE, "rb").read() == open(temp_file, "rb").read()
+    pb.get_image(temp_file, PNG, overwrite=False)
+    assert open(TEST_IMAGE_PNG, "rb").read() == open(temp_file, "rb").read()
 
     with pytest.raises(FileExistsError):
-        pb.get_image(temp_file, overwrite=False)
+        pb.get_image(temp_file, PNG, overwrite=False)
 
-    pb.get_image(temp_file, overwrite=True)
-    assert open(TEST_IMAGE, "rb").read() == open(temp_file, "rb").read()
+    pb.get_image(temp_file, PNG, overwrite=True)
+    assert open(TEST_IMAGE_PNG, "rb").read() == open(temp_file, "rb").read()
+
+
+def test_get_set_image_tiff(tmp_path):
+    """Test get_image() and set_image() methods for TIFF"""
+    pb = Pasteboard()
+    pb.set_image(TEST_IMAGE_TIFF, TIFF)
+    temp_file = tmp_path / "temp.tiff"
+    pb.get_image(temp_file, TIFF, overwrite=False)
+    assert open(TEST_IMAGE_TIFF, "rb").read() == open(temp_file, "rb").read()
+
+    with pytest.raises(FileExistsError):
+        pb.get_image(temp_file, TIFF, overwrite=False)
+
+    pb.get_image(temp_file, TIFF, overwrite=True)
+    assert open(TEST_IMAGE_TIFF, "rb").read() == open(temp_file, "rb").read()
+
+    # TIFF image doesn't have PNG representation
+    with pytest.raises(PasteboardTypeError):
+        pb.get_image(temp_file, PNG, overwrite=True)
 
 
 def test_has_text():
@@ -116,8 +136,14 @@ def test_has_image():
     pb = Pasteboard()
     pb.copy("Hello World")
     assert pb.has_image() is False
-    pb.copy_image(TEST_IMAGE)
+    pb.copy_image(TEST_IMAGE_PNG, PNG)
     assert pb.has_image() is True
+    assert pb.has_image(PNG) is True
+    assert pb.has_image(TIFF) is True
+    pb.copy_image(TEST_IMAGE_TIFF, TIFF)
+    assert pb.has_image() is True
+    assert pb.has_image(PNG) is False
+    assert pb.has_image(TIFF) is True
     pb.clear()
     assert pb.has_image() is False
 
@@ -130,3 +156,21 @@ def test_has_changed():
     pb2 = Pasteboard()
     pb2.copy("Hello World 2")
     assert pb.has_changed() is True
+
+
+def test_invalid_format(tmp_path):
+    """Test invalid format specifier raises PasteboardTypeError"""
+    pb = Pasteboard()
+    with pytest.raises(PasteboardTypeError):
+        pb.copy_image(TEST_IMAGE_PNG, "invalid")
+
+    pb.copy_image(TEST_IMAGE_PNG, PNG)
+    temp_file = tmp_path / "temp.png"
+    with pytest.raises(PasteboardTypeError):
+        pb.get_image(temp_file, "invalid")
+
+    with pytest.raises(PasteboardTypeError):
+        pb.get_image_data("invalid")
+
+    with pytest.raises(PasteboardTypeError):
+        pb.has_image("invalid")
