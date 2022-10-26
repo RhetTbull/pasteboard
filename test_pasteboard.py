@@ -38,6 +38,9 @@ def test_copy_paste_image(tmp_path):
     """Test copy_image() and paste_image() methods"""
     pb = Pasteboard()
     pb.copy_image(TEST_IMAGE_PNG, PNG)
+    # has_changed() should be False if clipboard was set, 
+    # will only be True if changed by an external app
+    assert not pb.has_changed()
     temp_file = tmp_path / TEST_IMAGE_PNG
     pb.paste_image(str(temp_file), PNG, overwrite=False)
     assert temp_file.exists()
@@ -77,6 +80,9 @@ def test_get_set_image(tmp_path):
     """Test get_image() and set_image() methods"""
     pb = Pasteboard()
     pb.set_image(TEST_IMAGE_PNG, PNG)
+    # has_changed() should be False if clipboard was set, 
+    # will only be True if changed by an external app
+    assert not pb.has_changed()
     temp_file = tmp_path / "temp.png"
     pb.get_image(temp_file, PNG, overwrite=False)
     assert open(TEST_IMAGE_PNG, "rb").read() == open(temp_file, "rb").read()
@@ -126,6 +132,9 @@ def test_set_text_and_image(tmp_path):
     """Test set_text_and_image() method"""
     pb = Pasteboard()
     pb.set_text_and_image("A photo of a palm tree", TEST_IMAGE_PNG, PNG)
+    # has_changed() should be False if clipboard was set, 
+    # will only be True if changed by an external app
+    assert not pb.has_changed()
     assert pb.has_text()
     assert pb.has_image()
     assert pb.get_text() == "A photo of a palm tree"
