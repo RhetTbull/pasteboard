@@ -122,6 +122,30 @@ def test_get_set_image_tiff(tmp_path):
         pb.get_image(temp_file, PNG, overwrite=True)
 
 
+def test_set_text_and_image(tmp_path):
+    """Test set_text_and_image() method"""
+    pb = Pasteboard()
+    pb.set_text_and_image("A photo of a palm tree", TEST_IMAGE_PNG, PNG)
+    assert pb.has_text()
+    assert pb.has_image()
+    assert pb.get_text() == "A photo of a palm tree"
+    temp_file = tmp_path / "temp.png"
+    pb.get_image(temp_file, PNG, overwrite=False)
+    assert open(TEST_IMAGE_PNG, "rb").read() == open(temp_file, "rb").read()
+
+
+def test_set_text_and_image_pathlib(tmp_path):
+    """Test set_text_and_image() method with pathlib.Path input"""
+    pb = Pasteboard()
+    pb.set_text_and_image("A photo of a palm tree", pathlib.Path(TEST_IMAGE_PNG), PNG)
+    assert pb.has_text()
+    assert pb.has_image()
+    assert pb.get_text() == "A photo of a palm tree"
+    temp_file = tmp_path / "temp.png"
+    pb.get_image(temp_file, PNG, overwrite=False)
+    assert open(TEST_IMAGE_PNG, "rb").read() == open(temp_file, "rb").read()
+
+
 def test_has_text():
     """Test has_text() method"""
     pb = Pasteboard()

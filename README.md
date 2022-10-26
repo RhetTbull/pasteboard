@@ -67,6 +67,11 @@ if pb.has_image(PNG):
 if pb.has_image(TIFF):
     print("Clipboard contains a TIFF image")
 
+# the clipboard can also be set to both text and an image simultaneously
+pb.set_text_and_image("Hello World", "test.png", PNG)
+print(f"Clipboard contains text: {pb.has_text()}")
+print(f"Clipboard contains an image: {pb.has_image()}")
+
 # monitor the clipboard for changes
 # Note: changes made by the Pasteboard instance itself are ignored
 # this is useful for monitoring changes made by other applications
