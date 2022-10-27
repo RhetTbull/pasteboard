@@ -4,6 +4,8 @@ Author: Rhet Turnbull <rturnbull+git@gmail.com>
 
 License: MIT License, copyright 2022 Rhet Turnbull
 
+Original Source: https://github.com/RhetTbull/textinator
+
 Version: 1.1.0, 2022-10-26
 """
 
